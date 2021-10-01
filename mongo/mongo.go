@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -24,6 +25,7 @@ func Connect(clusterURL string) (*DB, error) {
 	db := &DB{
 		Client: client,
 	}
+	log.Println("Database connected successfully")
 	return db, nil
 }
 
