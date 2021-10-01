@@ -136,10 +136,7 @@ func contains(v string, a []string) bool {
 }
 
 func isAllowedLength(text string) bool {
-	if len(text) > 257 {
-		return false
-	}
-	return true
+	return len(text) <= 257
 }
 
 func ConnTwitter(accessToken string, accessSecret string) *twitt.Client {
@@ -148,16 +145,12 @@ func ConnTwitter(accessToken string, accessSecret string) *twitt.Client {
 	httpClient := config.Client(oauth1.NoContext, token)
 
 	client := twitt.NewClient(httpClient)
-<<<<<<< HEAD
 	return client
 }
 
 func SendTweetText(client *twitt.Client, message string) (comp bool, err error) {
 	tweet, resp, err := client.Statuses.Update(message, nil)
 
-=======
-	tweet, resp, err := client.Statuses.Update("just setting up tinz", nil)
->>>>>>> 4d5e647fb8a4f31ba8a1b4ab0f06af5fdcbd8a96
 	if err != nil {
 		fmt.Println(err)
 		return false, err
