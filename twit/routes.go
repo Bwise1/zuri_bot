@@ -47,7 +47,7 @@ func CreateNewTweet(rw http.ResponseWriter, req *http.Request) {
 	comp, err := SendTweet(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
 	println(comp)
 	if err != nil {
-		fmt.Fprintln(rw, "Hello world!")
+		fmt.Fprintln(rw, err)
 	}
 	fmt.Fprintln(rw, comp)
 
