@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Bwise1/zuri_bot/twit"
+	"github.com/Bwise1/zuri_bot/users"
 	"github.com/dghubble/gologin/v2/twitter"
 	"github.com/dghubble/oauth1"
 	twitterOAuth1 "github.com/dghubble/oauth1/twitter"
@@ -23,7 +24,7 @@ type App struct {
 	*mux.Router
 	*http.Server
 	*mongo.DB
-	// Twitter credentials
+	users.UserService
 }
 
 func main() {
@@ -46,29 +47,39 @@ func NewApp(db *mongo.DB) *App {
 		WriteTimeout: 15 * time.Second,
 	}
 	app := &App{
-		Router: router,
-		Server: server,
-		DB:     db,
+		Router:      router,
+		Server:      server,
+		DB:          db,
+		UserService: users.NewUserService(db),
 	}
 	app.RegisterRoutes()
 	return app
 }
 
+func getDefaultEnv(key, defaultVal string) string {
+	if val := os.Getenv(key); val != "" {
+		return val
+	}
+	return defaultVal
+}
+
 func (a *App) RegisterRoutes() {
 	router := a.Router
+	uh := users.NewUserHandler(a.UserService)
 	oauth1Config := &oauth1.Config{
 		ConsumerKey:    os.Getenv("CONSUMER_KEY"),
 		ConsumerSecret: os.Getenv("CONSUMER_SECRET"),
-		CallbackURL:    "https://zuri-bot.herokuapp.com/twitter/callback",
+		CallbackURL:    getDefaultEnv("CALLBACK_URL", "https://zuri-bot.herokuapp.com/twitter/callback"),
 		Endpoint:       twitterOAuth1.AuthorizeEndpoint,
 	}
-	router.HandleFunc("/", func(rw http.ResponseWriter,
-		r *http.Request) {
+
+	router.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(rw, "Hello world!")
 	})
 	// twit.SendTweet(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
 	router.Handle("/twitter/login", twitter.LoginHandler(oauth1Config, nil))
-	router.Handle("/twitter/callback", twitter.CallbackHandler(oauth1Config, twit.IssueSession(), nil))
+	router.Handle("/twitter/callback", twitter.CallbackHandler(oauth1Config, twit.IssueSession(
+		http.HandlerFunc(uh.NewUser)), nil))
 	router.HandleFunc("/send-tweet", twit.CreateNewTweet)
 
 	a.Handler = handlers.LoggingHandler(os.Stdout, router)
