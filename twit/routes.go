@@ -95,7 +95,7 @@ func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	mediaIDs := make([]int64, 4)
+	var mediaIDs []int64
 	for i := 0; i < 4; i++ {
 		mimeType := files[i].Header.Get("Content-Type")
 		if contains(mimeType, allowedMimeTypes) {
