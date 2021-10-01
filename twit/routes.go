@@ -71,7 +71,7 @@ func SendTweet(accessToken string, accessSecret string) (comp bool, err error) {
 	httpClient := config.Client(oauth1.NoContext, token)
 
 	client := twitt.NewClient(httpClient)
-	tweet, resp, err := client.Statuses.Update("just setting up my twttr", nil)
+	tweet, resp, err := client.Statuses.Update("just setting up tinz", nil)
 	if err != nil {
 		fmt.Println(err)
 		return false, err
