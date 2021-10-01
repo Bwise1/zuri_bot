@@ -7,6 +7,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/Bwise1/zuri_bot/twit"
+	"github.com/dghubble/gologin/v2/twitter"
+	"github.com/dghubble/oauth1"
+	twitterOAuth1 "github.com/dghubble/oauth1/twitter"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
@@ -41,11 +45,20 @@ func NewApp() *App {
 
 func (a *App) RegisterRoutes() {
 	router := a.Router
-
+	oauth1Config := &oauth1.Config{
+		ConsumerKey:    os.Getenv("CONSUMER_KEY"),
+		ConsumerSecret: os.Getenv("CONSUMER_SECRET"),
+		CallbackURL:    "https://cacf-69-174-101-131.ngrok.io/twitter/callback",
+		Endpoint:       twitterOAuth1.AuthorizeEndpoint,
+	}
 	router.HandleFunc("/", func(rw http.ResponseWriter,
 		r *http.Request) {
 		fmt.Fprintln(rw, "Hello world!")
 	})
+	// twit.SendTweet(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
+	router.Handle("/twitter/login", twitter.LoginHandler(oauth1Config, nil))
+	router.Handle("/twitter/callback", twitter.CallbackHandler(oauth1Config, twit.IssueSession(), nil))
+	// router.HandleFunc("/send-tweet", twit.CreateNewTweet)
 
 	a.Handler = handlers.LoggingHandler(os.Stdout, router)
 }
