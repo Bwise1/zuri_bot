@@ -115,6 +115,7 @@ func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
 
 		}
 	}
+	fmt.Println(mediaIDs)
 	comp, err := SendTweetMedia(twClient, mediaIDs, message)
 	if err != nil {
 		rw.WriteHeader(200)
@@ -186,10 +187,9 @@ func UploadMedia(client *twitt.Client, byts []byte, mType string) (int64, error)
 
 func SendTweetMedia(client *twitt.Client, mediaIDS []int64, message string) (comp bool, err error) {
 	tweet, _, err := client.Statuses.Update(message, &twitt.StatusUpdateParams{MediaIds: mediaIDS})
-
+	fmt.Println(tweet)
 	if err != nil {
 		return false, err
 	}
-	println(tweet.Text)
 	return true, nil
 }
