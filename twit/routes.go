@@ -2,11 +2,15 @@ package twit
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 
+	twitt "github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/gologin/v2/twitter"
+	"github.com/dghubble/oauth1"
 	"github.com/dghubble/sessions"
 )
 
@@ -39,9 +43,15 @@ func IssueSession() http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-// func CreateNewTweet(w http.ResponseWriter, req *http.Request) {
-// 	SendTweet(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
-// }
+func CreateNewTweet(rw http.ResponseWriter, req *http.Request) {
+	comp, err := SendTweet(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
+	println(comp)
+	if err != nil {
+		fmt.Fprintln(rw, "Hello world!")
+	}
+	fmt.Fprintln(rw, comp)
+
+}
 
 func RandomString(n int) string {
 	var output string
@@ -55,24 +65,26 @@ func RandomString(n int) string {
 	return output
 }
 
-// func SendTweet(accessToken string, accessSecret string) {
-// 	config := oauth1.NewConfig(os.Getenv("CONSUMER_KEY"), os.Getenv("CONSUMER_SECRET"))
-// 	token := oauth1.NewToken(accessToken, accessSecret)
-// 	httpClient := config.Client(oauth1.NoContext, token)
+func SendTweet(accessToken string, accessSecret string) (comp bool, err error) {
+	config := oauth1.NewConfig(os.Getenv("CONSUMER_KEY"), os.Getenv("CONSUMER_SECRET"))
+	token := oauth1.NewToken(accessToken, accessSecret)
+	httpClient := config.Client(oauth1.NoContext, token)
 
-// 	client := twitt.NewClient(httpClient)
-// 	tweet, resp, err := client.Statuses.Update("just setting up my twttr", nil)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	if resp.StatusCode == http.StatusOK {
-// 		bodyBytes, err := ioutil.ReadAll(resp.Body)
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-// 		bodyString := string(bodyBytes)
-// 		fmt.Println(bodyString)
-// 	}
-// 	println(tweet, err)
-
-// }
+	client := twitt.NewClient(httpClient)
+	tweet, resp, err := client.Statuses.Update("just setting up my twttr", nil)
+	if err != nil {
+		fmt.Println(err)
+		return false, err
+	}
+	if resp.StatusCode == http.StatusOK {
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println(err)
+			return false, err
+		}
+		bodyString := string(bodyBytes)
+		fmt.Println(bodyString)
+	}
+	println(tweet, err)
+	return true, nil
+}

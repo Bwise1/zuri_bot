@@ -58,7 +58,7 @@ func (a *App) RegisterRoutes() {
 	// twit.SendTweet(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
 	router.Handle("/twitter/login", twitter.LoginHandler(oauth1Config, nil))
 	router.Handle("/twitter/callback", twitter.CallbackHandler(oauth1Config, twit.IssueSession(), nil))
-	// router.HandleFunc("/send-tweet", twit.CreateNewTweet)
+	router.HandleFunc("/send-tweet", twit.CreateNewTweet)
 
 	a.Handler = handlers.LoggingHandler(os.Stdout, router)
 }
