@@ -48,7 +48,7 @@ func (a *App) RegisterRoutes() {
 	oauth1Config := &oauth1.Config{
 		ConsumerKey:    os.Getenv("CONSUMER_KEY"),
 		ConsumerSecret: os.Getenv("CONSUMER_SECRET"),
-		CallbackURL:    "https://cacf-69-174-101-131.ngrok.io/twitter/callback",
+		CallbackURL:    "https://zuri-bot.herokuapp.com/twitter/callback",
 		Endpoint:       twitterOAuth1.AuthorizeEndpoint,
 	}
 	router.HandleFunc("/", func(rw http.ResponseWriter,
