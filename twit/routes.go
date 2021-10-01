@@ -189,6 +189,7 @@ func SendTweetMedia(client *twitt.Client, mediaIDS []int64, message string) (com
 	tweet, _, err := client.Statuses.Update(message, &twitt.StatusUpdateParams{MediaIds: mediaIDS})
 	fmt.Println(tweet)
 	if err != nil {
+		fmt.Println(err)
 		return false, err
 	}
 	return true, nil
