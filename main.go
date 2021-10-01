@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Bwise1/zuri_bot/twit"
-
 	"github.com/dghubble/gologin/v2/twitter"
 	"github.com/dghubble/oauth1"
 	twitterOAuth1 "github.com/dghubble/oauth1/twitter"
@@ -24,22 +22,21 @@ type App struct {
 	*mux.Router
 	*http.Server
 	*mongo.DB
-	// Twitter credentials
 }
 
 func main() {
 	port := getPort()
 
-	db, err := mongo.Connect(os.Getenv("CLUSTER_URL"))
-	defer db.Disconnect(context.Background())
+	/*db, err := mongo.Connect(os.Getenv("CLUSTER_URL"))
+	 defer db.Disconnect(context.Background())
 	if err != nil {
 		panic(err)
-	}
-	app := NewApp(db)
+	}*/
+	app := NewApp()
 	log.Fatal(app.Run(port))
 }
 
-func NewApp(db *mongo.DB) *App {
+func NewApp() *App {
 	router := mux.NewRouter().StrictSlash(true)
 	server := &http.Server{
 		Handler:      router,
@@ -49,7 +46,7 @@ func NewApp(db *mongo.DB) *App {
 	app := &App{
 		Router: router,
 		Server: server,
-		DB:     db,
+		//	DB:     db,
 	}
 	app.RegisterRoutes()
 	return app
@@ -63,8 +60,8 @@ func (a *App) RegisterRoutes() {
 		CallbackURL:    "https://zuri-bot.herokuapp.com/twitter/callback",
 		Endpoint:       twitterOAuth1.AuthorizeEndpoint,
 	}
-	router.HandleFunc("/", func(rw http.ResponseWriter,
-		r *http.Request) {
+
+	router.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(rw, "Hello world!")
 	})
 	// twit.SendTweet(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
