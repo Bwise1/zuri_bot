@@ -2,8 +2,6 @@ module github.com/Bwise1/zuri_bot
 
 go 1.17
 
-replace github.com/dghubble/go-twitter => ./go-twitter
-
 require (
 	github.com/cenkalti/backoff v2.1.1+incompatible // indirect
 	github.com/dghubble/go-twitter v0.0.0-20210609183100-2fdbf421508e // indirect
