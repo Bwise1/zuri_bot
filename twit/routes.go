@@ -81,17 +81,20 @@ func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
 
 	err := req.ParseMultipartForm(200000)
 	if err != nil {
+		fmt.Println("error here", err)
 		rw.WriteHeader(400)
 		return
 	}
 	formdata := req.MultipartForm
 	files := formdata.File["media"]
 	message := req.FormValue("message")
+	fmt.Println("Hello", message)
 	if !isAllowedLength(message) {
+		fmt.Println(message)
 		rw.WriteHeader(400)
 		return
 	}
-	fmt.Println(message)
+
 	mediaIDs := make([]int64, 4)
 	for i := 0; i < 4; i++ {
 		mimeType := files[i].Header.Get("Content-Type")
@@ -112,7 +115,11 @@ func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
 
 		}
 	}
-	SendTweetMedia(twClient, mediaIDs, message)
+	comp, err := SendTweetMedia(twClient, mediaIDs, message)
+	if err != nil {
+		rw.WriteHeader(200)
+	}
+	fmt.Fprintln(rw, comp)
 
 }
 func RandomString(n int) string {
