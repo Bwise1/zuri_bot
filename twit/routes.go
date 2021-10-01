@@ -24,7 +24,7 @@ const (
 // sessionStore encodes and decodes session data stored in signed cookies
 var sessionStore = sessions.NewCookieStore([]byte(sessionSecret), nil)
 
-func IssueSession() http.Handler {
+func IssueSession(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
 		twitterUser, err := twitter.UserFromContext(ctx)
@@ -38,6 +38,7 @@ func IssueSession() http.Handler {
 		session.Values[sessionUserKey] = twitterUser.ID
 		session.Values[sessionUsername] = twitterUser.ScreenName
 		session.Save(w)
+		h.ServeHTTP(w, req)
 		http.Redirect(w, req, "/", http.StatusFound)
 	}
 	return http.HandlerFunc(fn)
