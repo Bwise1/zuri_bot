@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -28,16 +27,16 @@ type App struct {
 func main() {
 	port := getPort()
 
-	db, err := mongo.Connect(os.Getenv("CLUSTER_URL"))
-	defer db.Disconnect(context.Background())
+	/*db, err := mongo.Connect(os.Getenv("CLUSTER_URL"))
+	 defer db.Disconnect(context.Background())
 	if err != nil {
 		panic(err)
-	}
-	app := NewApp(db)
+	}*/
+	app := NewApp()
 	log.Fatal(app.Run(port))
 }
 
-func NewApp(db *mongo.DB) *App {
+func NewApp() *App {
 	router := mux.NewRouter().StrictSlash(true)
 	server := &http.Server{
 		Handler:      router,
@@ -47,17 +46,10 @@ func NewApp(db *mongo.DB) *App {
 	app := &App{
 		Router: router,
 		Server: server,
-		DB:     db,
+		//	DB:     db,
 	}
 	app.RegisterRoutes()
 	return app
-}
-
-func getDefaultEnv(key, defaultVal string) string {
-	if val := os.Getenv(key); val != "" {
-		return val
-	}
-	return defaultVal
 }
 
 func (a *App) RegisterRoutes() {
@@ -65,7 +57,7 @@ func (a *App) RegisterRoutes() {
 	oauth1Config := &oauth1.Config{
 		ConsumerKey:    os.Getenv("CONSUMER_KEY"),
 		ConsumerSecret: os.Getenv("CONSUMER_SECRET"),
-		CallbackURL:    getDefaultEnv("CALLBACK_URL", "https://zuri-bot.herokuapp.com/twitter/callback"),
+		CallbackURL:    "https://zuri-bot.herokuapp.com/twitter/callback",
 		Endpoint:       twitterOAuth1.AuthorizeEndpoint,
 	}
 
