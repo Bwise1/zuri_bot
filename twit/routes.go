@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	twitt "github.com/Bwise1/zuri_bot/go-twitter/twitter"
+	twitt "github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/gologin/v2/twitter"
 	"github.com/dghubble/oauth1"
 	"github.com/dghubble/sessions"
