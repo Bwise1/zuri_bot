@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Bwise1/zuri_bot/twit"
+
 	"github.com/dghubble/gologin/v2/twitter"
 	"github.com/dghubble/oauth1"
 	twitterOAuth1 "github.com/dghubble/oauth1/twitter"
@@ -58,7 +59,8 @@ func (a *App) RegisterRoutes() {
 	// twit.SendTweet(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
 	router.Handle("/twitter/login", twitter.LoginHandler(oauth1Config, nil))
 	router.Handle("/twitter/callback", twitter.CallbackHandler(oauth1Config, twit.IssueSession(), nil))
-	router.HandleFunc("/send-tweet", twit.CreateNewTweet)
+	router.HandleFunc("/twitter/post-text", twit.CreateNewTweetText).Methods("POST")
+	router.HandleFunc("/twitter/post-media", twit.CreateNewTweetMedia).Methods("POST")
 
 	a.Handler = handlers.LoggingHandler(os.Stdout, router)
 }
