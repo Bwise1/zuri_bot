@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -31,4 +32,9 @@ func Connect(clusterURL string) (*DB, error) {
 
 func CloseConn(db *DB) error {
 	return db.Client.Disconnect(context.TODO())
+}
+
+func (db *DB) GetCollection(name string) *mongo.Collection {
+	dbName := os.Getenv("DB_NAME")
+	return db.Client.Database(dbName).Collection(name)
 }
