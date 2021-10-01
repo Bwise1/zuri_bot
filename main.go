@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,21 +16,30 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
+
+	"github.com/Bwise1/zuri_bot/mongo"
 )
 
 type App struct {
 	*mux.Router
 	*http.Server
+	*mongo.DB
 	// Twitter credentials
 }
 
 func main() {
 	port := getPort()
-	app := NewApp()
+
+	db, err := mongo.Connect(os.Getenv("CLUSTER_URL"))
+	defer db.Disconnect(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	app := NewApp(db)
 	log.Fatal(app.Run(port))
 }
 
-func NewApp() *App {
+func NewApp(db *mongo.DB) *App {
 	router := mux.NewRouter().StrictSlash(true)
 	server := &http.Server{
 		Handler:      router,
@@ -39,6 +49,7 @@ func NewApp() *App {
 	app := &App{
 		Router: router,
 		Server: server,
+		DB:     db,
 	}
 	app.RegisterRoutes()
 	return app
