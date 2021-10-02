@@ -2,6 +2,7 @@ module github.com/Bwise1/zuri_bot
 
 go 1.17
 
+// +heroku goVersion go1.17
 require (
 	github.com/cenkalti/backoff v2.1.1+incompatible
 	github.com/dghubble/gologin/v2 v2.3.0

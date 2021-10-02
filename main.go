@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Bwise1/zuri_bot/twit"
+	oauth1Login "github.com/dghubble/gologin/v2/oauth1"
 	"github.com/dghubble/gologin/v2/twitter"
 	"github.com/dghubble/oauth1"
 	twitterOAuth1 "github.com/dghubble/oauth1/twitter"
@@ -71,12 +72,12 @@ func (a *App) RegisterRoutes() {
 	})
 	// twit.SendTweet(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
 	router.Handle("/twitter/login", twitter.LoginHandler(oauth1Config, nil))
-	router.Handle("/twitter/callback", twitter.CallbackHandler(oauth1Config, twit.IssueSession(), nil))
+	router.Handle("/twitter/callback", twitter.CallbackHandler(oauth1Config, twit.IssueSession(a.SaveUserLogin), nil))
 	router.HandleFunc("/twitter/post-text", twit.CreateNewTweetText).Methods("POST")
 	router.HandleFunc("/twitter/post-media", twit.CreateNewTweetMedia).Methods("POST")
 
 	c := cors.AllowAll().Handler(router)
-	a.Handler = handlers.LoggingHandler(os.Stdout, c)
+	a.Server.Handler = handlers.LoggingHandler(os.Stdout, c)
 }
 
 func (a *App) Run(port ...string) error {
@@ -95,4 +96,23 @@ func getPort() string {
 		port = "8081"
 	}
 	return port
+}
+
+func (a *App) SaveUserLogin(w http.ResponseWriter, r *http.Request) {
+	collectionName := "twitter_users"
+	token, secret, err := oauth1Login.AccessTokenFromContext(r.Context())
+	tu, err := twitter.UserFromContext(r.Context())
+	if err != nil {
+		log.Printf("Error getting user tokens: %v", err)
+		return
+	}
+	coll := a.DB.GetCollection(collectionName)
+	doc := map[string]interface{}{
+		"token":  token,
+		"secret": secret,
+		"user":   tu,
+	}
+	if _, err := coll.InsertOne(r.Context(), doc); err != nil {
+		log.Printf("error: %v", err)
+	}
 }
