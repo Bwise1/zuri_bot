@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -191,20 +190,11 @@ func ConnTwitter(accessToken string, accessSecret string) *twitt.Client {
 }
 
 func SendTweetText(client *twitt.Client, message string) (comp bool, err error) {
-	tweet, resp, err := client.Statuses.Update(message, nil)
+	tweet, _, err := client.Statuses.Update(message, nil)
 
 	if err != nil {
 		fmt.Println(err)
 		return false, err
-	}
-	if resp.StatusCode == http.StatusOK {
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println(err)
-			return false, err
-		}
-		bodyString := string(bodyBytes)
-		fmt.Println(bodyString)
 	}
 	println(tweet, err)
 	return true, nil
