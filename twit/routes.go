@@ -83,7 +83,7 @@ func CreateNewTweetText(rw http.ResponseWriter, req *http.Request) {
 	twClient := ConnTwitter(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
 	comp, err := SendTweetText(twClient, bod["message"])
 	if err != nil {
-		respBody := SendTweetResp{StatusCode: 400, IsSent: comp, Message: err}
+		respBody := SendTweetResp{StatusCode: 419, IsSent: comp, Message: err}
 		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
 			log.Printf("Error Sending Response", err)
 		}
