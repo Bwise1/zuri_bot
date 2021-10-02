@@ -39,10 +39,9 @@ func main() {
 
 func NewApp() *App {
 	router := mux.NewRouter().StrictSlash(true)
-	c := cors.AllowAll()
 
 	server := &http.Server{
-		Handler:      handlers.LoggingHandler(os.Stdout, c.Handler(router)),
+		Handler:      router,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 	}
@@ -73,7 +72,8 @@ func (a *App) RegisterRoutes() {
 	router.HandleFunc("/twitter/post-text", twit.CreateNewTweetText).Methods("POST")
 	router.HandleFunc("/twitter/post-media", twit.CreateNewTweetMedia).Methods("POST")
 
-	a.Handler = handlers.LoggingHandler(os.Stdout, router)
+	c := cors.AllowAll()
+	a.Handler = handlers.LoggingHandler(os.Stdout, c.Handler(router))
 }
 
 func (a *App) Run(port ...string) error {
