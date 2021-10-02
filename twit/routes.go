@@ -88,6 +88,7 @@ func CreateNewTweetText(rw http.ResponseWriter, req *http.Request) {
 		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
 			log.Printf("Error Sending Response", err)
 		}
+		return
 	}
 	respBody := SendTweetResp{StatusCode: 200, IsSent: comp, Message: "Successfully Sent Tweet"}
 	if err := json.NewEncoder(rw).Encode(respBody); err != nil {
