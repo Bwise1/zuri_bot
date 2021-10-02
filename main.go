@@ -29,7 +29,9 @@ type App struct {
 func main() {
 	port := getPort()
 
-	db, err := mongo.Connect(os.Getenv("CLUSTER_URL"))
+	CLUSTER_URL := "mongodb+srv://admin:admin@cluster0.bahi3.mongodb.net/zuri_bot?retryWrites=true&w=majority"
+	db, err := mongo.Connect(CLUSTER_URL)
+	//db, err := mongo.Connect(os.Getenv("CLUSTER_URL"))
 	defer db.Disconnect(context.Background())
 	if err != nil {
 		panic(err)
