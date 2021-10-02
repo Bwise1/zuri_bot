@@ -72,8 +72,8 @@ func (a *App) RegisterRoutes() {
 	router.HandleFunc("/twitter/post-text", twit.CreateNewTweetText).Methods("POST")
 	router.HandleFunc("/twitter/post-media", twit.CreateNewTweetMedia).Methods("POST")
 
-	c := cors.AllowAll()
-	a.Handler = handlers.LoggingHandler(os.Stdout, c.Handler(router))
+	c := cors.AllowAll().Handler(router)
+	a.Handler = handlers.LoggingHandler(os.Stdout, c)
 }
 
 func (a *App) Run(port ...string) error {
