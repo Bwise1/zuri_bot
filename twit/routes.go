@@ -98,6 +98,8 @@ func CreateNewTweetText(rw http.ResponseWriter, req *http.Request) {
 }
 
 func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
+	rw.Header().Set("Content-Type", "application/json")
+
 	twClient := ConnTwitter(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
 
 	err := req.ParseMultipartForm(200000)
