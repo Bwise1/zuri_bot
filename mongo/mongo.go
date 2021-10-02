@@ -41,5 +41,8 @@ func CloseConn(db *DB) error {
 
 func (db *DB) GetCollection(name string) *mongo.Collection {
 	dbName := os.Getenv("DB_NAME")
+	if dbName == "" {
+		dbName = "zuri_bot"
+	}
 	return db.Client.Database(dbName).Collection(name)
 }
