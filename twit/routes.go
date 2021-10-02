@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -32,6 +33,12 @@ var allowedMimeTypes = []string{"application/pdf",
 	"application/x-rar-compressed", " application/octet-stream", " application/zip", "application/octet-stream", "application/x-zip-compressed", "multipart/x-zip",
 }
 
+type SendTweetResp struct {
+	StatusCode int         `json:"status_code"`
+	IsSent     bool        `json:"is_sent"`
+	Message    interface{} `json:"message"`
+}
+
 // sessionStore encodes and decodes session data stored in signed cookies
 var sessionStore = sessions.NewCookieStore([]byte(sessionSecret), nil)
 
@@ -55,24 +62,37 @@ func IssueSession() http.Handler {
 }
 
 func CreateNewTweetText(rw http.ResponseWriter, req *http.Request) {
+	rw.Header().Set("Content-Type", "application/json")
 	var bod map[string]string
 	err := json.NewDecoder(req.Body).Decode(&bod)
 	if err != nil {
 		rw.WriteHeader(400)
+		respBody := SendTweetResp{StatusCode: 400, IsSent: false, Message: err}
+		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
+			log.Printf("Error Sending Response", err)
+		}
 		return
 	}
 	if !isAllowedLength(bod["message"]) {
-		rw.WriteHeader(400)
+		respBody := SendTweetResp{StatusCode: 400, IsSent: false, Message: "Error Sending Tweet, length is more that 257 characters"}
+		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
+			log.Printf("Error Sending Response", err)
+		}
 		return
 	}
 
 	twClient := ConnTwitter(os.Getenv("ACCESS_TOKEN"), os.Getenv("ACCESS_SECRET"))
 	comp, err := SendTweetText(twClient, bod["message"])
-	println(comp)
 	if err != nil {
-		fmt.Fprintln(rw, err)
+		respBody := SendTweetResp{StatusCode: 400, IsSent: comp, Message: err}
+		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
+			log.Printf("Error Sending Response", err)
+		}
 	}
-	fmt.Fprintln(rw, comp)
+	respBody := SendTweetResp{StatusCode: 200, IsSent: comp, Message: "Successfully Sent Tweet"}
+	if err := json.NewEncoder(rw).Encode(respBody); err != nil {
+		log.Printf("Error Sending Response", err)
+	}
 
 }
 
@@ -82,16 +102,22 @@ func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
 	err := req.ParseMultipartForm(200000)
 	if err != nil {
 		fmt.Println("error here", err)
-		rw.WriteHeader(400)
-		return
+		respBody := SendTweetResp{StatusCode: 400, IsSent: false, Message: "Error Processign Form"}
+		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
+			log.Printf("Error Sending Response", err)
+			return
+		}
+
 	}
 	formdata := req.MultipartForm
 	files := formdata.File["media"]
 	message := req.FormValue("message")
 	fmt.Println("Hello", message)
 	if !isAllowedLength(message) {
-		fmt.Println(message)
-		rw.WriteHeader(400)
+		respBody := SendTweetResp{StatusCode: 400, IsSent: false, Message: "Error Sending Tweet, length is more that 257 characters"}
+		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
+			log.Printf("Error Sending Response", err)
+		}
 		return
 	}
 
@@ -118,10 +144,15 @@ func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
 	fmt.Println(mediaIDs)
 	comp, err := SendTweetMedia(twClient, mediaIDs, message)
 	if err != nil {
-		rw.WriteHeader(200)
+		respBody := SendTweetResp{StatusCode: 500, IsSent: comp, Message: err}
+		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
+			log.Printf("Error Sending Response", err)
+		}
 	}
-	fmt.Fprintln(rw, comp)
-
+	respBody := SendTweetResp{StatusCode: 200, IsSent: comp, Message: "Successfully Sent Tweet"}
+	if err := json.NewEncoder(rw).Encode(respBody); err != nil {
+		log.Printf("Error Sending Response", err)
+	}
 }
 func RandomString(n int) string {
 	var output string
