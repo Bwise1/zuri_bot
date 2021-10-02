@@ -146,7 +146,7 @@ func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
 	fmt.Println(mediaIDs)
 	comp, err := SendTweetMedia(twClient, mediaIDs, message)
 	if err != nil {
-		respBody := SendTweetResp{StatusCode: 500, IsSent: comp, Message: err}
+		respBody := SendTweetResp{StatusCode: 419, IsSent: comp, Message: err}
 		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
 			log.Printf("Error Sending Response", err)
 		}

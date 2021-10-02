@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/rs/cors"
 
 	"github.com/Bwise1/zuri_bot/mongo"
 )
@@ -38,8 +39,10 @@ func main() {
 
 func NewApp() *App {
 	router := mux.NewRouter().StrictSlash(true)
+	c := cors.AllowAll()
+
 	server := &http.Server{
-		Handler:      router,
+		Handler:      handlers.LoggingHandler(os.Stdout, c.Handler(router)),
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 	}
