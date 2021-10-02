@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	twitt "github.com/dghubble/go-twitter/twitter"
+	twitt "github.com/Bwise1/zuri_bot/go-twitter/twitter"
 	"github.com/dghubble/gologin/v2/twitter"
 	"github.com/dghubble/oauth1"
 	"github.com/dghubble/sessions"
@@ -68,14 +68,14 @@ func CreateNewTweetText(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(400)
 		respBody := SendTweetResp{StatusCode: 400, IsSent: false, Message: err}
 		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
-			log.Printf("Error Sending Response", err)
+			log.Printf("Error Sending Response %v", err)
 		}
 		return
 	}
 	if !isAllowedLength(bod["message"]) {
 		respBody := SendTweetResp{StatusCode: 400, IsSent: false, Message: "Error Sending Tweet, length is more that 257 characters"}
 		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
-			log.Printf("Error Sending Response", err)
+			log.Printf("Error Sending Response, %v", err)
 		}
 		return
 	}
@@ -85,13 +85,13 @@ func CreateNewTweetText(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		respBody := SendTweetResp{StatusCode: 419, IsSent: comp, Message: err}
 		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
-			log.Printf("Error Sending Response", err)
+			log.Printf("Error Sending Response %v", err)
 		}
 		return
 	}
 	respBody := SendTweetResp{StatusCode: 200, IsSent: comp, Message: "Successfully Sent Tweet"}
 	if err := json.NewEncoder(rw).Encode(respBody); err != nil {
-		log.Printf("Error Sending Response", err)
+		log.Printf("Error Sending Response %v", err)
 	}
 
 }
@@ -106,7 +106,7 @@ func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
 		fmt.Println("error here", err)
 		respBody := SendTweetResp{StatusCode: 400, IsSent: false, Message: "Error Processign Form"}
 		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
-			log.Printf("Error Sending Response", err)
+			log.Printf("Error Sending Response %v", err)
 			return
 		}
 
@@ -118,7 +118,7 @@ func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
 	if !isAllowedLength(message) {
 		respBody := SendTweetResp{StatusCode: 400, IsSent: false, Message: "Error Sending Tweet, length is more that 257 characters"}
 		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
-			log.Printf("Error Sending Response", err)
+			log.Printf("Error Sending Response %v", err)
 		}
 		return
 	}
@@ -148,12 +148,12 @@ func CreateNewTweetMedia(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		respBody := SendTweetResp{StatusCode: 419, IsSent: comp, Message: err}
 		if err := json.NewEncoder(rw).Encode(respBody); err != nil {
-			log.Printf("Error Sending Response", err)
+			log.Printf("Error Sending Response %v", err)
 		}
 	}
 	respBody := SendTweetResp{StatusCode: 200, IsSent: comp, Message: "Successfully Sent Tweet"}
 	if err := json.NewEncoder(rw).Encode(respBody); err != nil {
-		log.Printf("Error Sending Response", err)
+		log.Printf("Error Sending Response %v", err)
 	}
 }
 func RandomString(n int) string {
