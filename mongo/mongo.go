@@ -21,10 +21,15 @@ func Connect(clusterURL string) (*DB, error) {
 	opts := options.Client().ApplyURI(clusterURL)
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
+		log.Printf("Error connecting to db: %v", err)
 		return nil, err
+
 	}
 	db := &DB{
 		Client: client,
+	}
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Fatalf("cannot ping server %v", err)
 	}
 	log.Println("Database connected successfully")
 	return db, nil

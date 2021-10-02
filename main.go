@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -28,16 +29,16 @@ type App struct {
 func main() {
 	port := getPort()
 
-	/*db, err := mongo.Connect(os.Getenv("CLUSTER_URL"))
-	 defer db.Disconnect(context.Background())
+	db, err := mongo.Connect(os.Getenv("CLUSTER_URL"))
+	defer db.Disconnect(context.Background())
 	if err != nil {
 		panic(err)
-	}*/
-	app := NewApp()
+	}
+	app := NewApp(db)
 	log.Fatal(app.Run(port))
 }
 
-func NewApp() *App {
+func NewApp(db *mongo.DB) *App {
 	router := mux.NewRouter().StrictSlash(true)
 
 	server := &http.Server{
@@ -48,7 +49,7 @@ func NewApp() *App {
 	app := &App{
 		Router: router,
 		Server: server,
-		//	DB:     db,
+		DB:     db,
 	}
 	app.RegisterRoutes()
 	return app
